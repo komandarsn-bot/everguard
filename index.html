@@ -1,29 +1,56 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#101916">
-<title>EVERGUARD — мониторинг датчиков</title>
-<link rel="stylesheet" href="./dashboard.css">
-<script type="module" src="./dashboard.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171f2b">
+  <title>EVERGUARD — показания станции</title>
+  <link rel="stylesheet" href="./dashboard.css?v=station">
+  <script type="module" src="./dashboard.js"></script>
 </head>
 <body>
-<header class="bar"><div class="wrap bar-inner"><span class="brand"><span class="mark" aria-hidden="true"></span>EVERGUARD</span><span class="bar-label">Станция наблюдения</span></div></header>
-<main class="wrap">
-  <section class="heading" aria-labelledby="title">
-    <h1 id="title">Мониторинг<br>датчиков</h1>
-    <div class="status-panel" id="status-panel" data-state="loading">
-      <span class="status-dot" aria-hidden="true"></span>
-      <div><span class="status-label" id="status-label">Подключение</span><p id="status" role="status">Загружаем показания…</p></div>
-    </div>
-  </section>
-  <section class="grid" aria-label="Последние показания">
-    <article class="metric"><div class="metric-top"><h2>Температура</h2><span class="chip">DHT22</span></div><div class="reading"><output id="temperature">—</output><span class="unit">°C</span></div></article>
-    <article class="metric"><div class="metric-top"><h2>Влажность</h2><span class="chip">DHT22</span></div><div class="reading"><output id="humidity">—</output><span class="unit">%</span></div></article>
-    <article class="metric"><div class="metric-top"><h2>Дым и газ</h2><span class="chip">MQ‑2</span></div><div class="reading"><output id="mq2">—</output><span class="unit">АЦП</span></div></article>
-    <article class="metric"><div class="metric-top"><h2>Показание MQ‑135</h2><span class="chip">MQ‑135</span></div><div class="reading"><output id="mq135">—</output><span class="unit">АЦП</span></div></article>
-  </section>
-</main>
+  <div class="layout">
+    <header class="station">
+      <div class="identity">
+        <span class="mark" aria-hidden="true"></span>
+        <div><p class="brand">EVERGUARD</p><p class="description">Станция мониторинга</p></div>
+      </div>
+      <div class="status-panel" id="status-panel" data-state="loading">
+        <span class="status-label"><span class="status-dot" aria-hidden="true"></span><span id="status-label">Подключение</span></span>
+        <p id="status" role="status">Загружаем показания…</p>
+      </div>
+    </header>
+    <main class="workspace">
+      <div class="content">
+        <h1>Показания станции</h1>
+        <section class="group" aria-labelledby="climate">
+          <div class="group-heading"><h2 id="climate">Микроклимат</h2><small>DHT22</small></div>
+          <div class="metrics">
+            <div class="metric">
+              <h3>Температура</h3>
+              <div class="reading"><output id="temperature" aria-label="Температура в градусах Цельсия">—</output><span class="unit">°C</span></div>
+            </div>
+            <div class="metric">
+              <h3>Влажность</h3>
+              <div class="reading"><output id="humidity" aria-label="Влажность в процентах">—</output><span class="unit">%</span></div>
+            </div>
+          </div>
+        </section>
+        <section class="group" aria-labelledby="air">
+          <div class="group-heading"><h2 id="air">Датчики воздуха</h2><small>Сырые показания АЦП</small></div>
+          <div class="metrics">
+            <div class="metric">
+              <h3>MQ‑2 <span>Дым и газ</span></h3>
+              <div class="reading"><output id="mq2" aria-label="Показание MQ-2">—</output><span class="unit">АЦП</span></div>
+            </div>
+            <div class="metric">
+              <h3>MQ‑135</h3>
+              <div class="reading"><output id="mq135" aria-label="Показание MQ-135">—</output><span class="unit">АЦП</span></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
 </body>
 </html>
