@@ -2,6 +2,16 @@ const status = document.querySelector('#status');
 const panel = document.querySelector('#status-panel');
 const label = document.querySelector('#status-label');
 const fields = ['temperature', 'humidity', 'mq2', 'mq135'];
+const formatReading = new Intl.NumberFormat('ru-KZ', { maximumFractionDigits: 2 });
+const formatChange = new Intl.NumberFormat('ru-KZ', { maximumFractionDigits: 2, signDisplay: 'always' });
+const readings = fields.map((field) => {
+  const output = document.getElementById(field);
+  const metric = output.closest('.metric');
+  const delta = document.createElement('span');
+  delta.className = 'delta';
+  metric.append(delta);
+  return { field, output, metric, delta, value: null, timeout: undefined };
+});
 let settingsVersion = 0;
 let updatedAt;
 let timer;
@@ -13,8 +23,25 @@ function showStatus(state, title, detail) {
 }
 
 function render(row) {
-  for (const field of fields) {
-    document.getElementById(field).textContent = row ? Number(row[field]).toLocaleString('ru-KZ') : '—';
+  for (const reading of readings) {
+    const value = row?.[reading.field] == null ? null : Number(row[reading.field]);
+    if (value === reading.value) continue;
+    const previous = reading.value;
+    reading.value = value;
+    reading.output.textContent = value === null ? '—' : formatReading.format(value);
+    clearTimeout(reading.timeout);
+    delete reading.metric.dataset.change;
+    reading.delta.textContent = '';
+    if (previous !== null && value !== null) {
+      const change = Math.round((value - previous) * 100) / 100;
+      if (!change) continue;
+      reading.metric.dataset.change = change > 0 ? 'up' : 'down';
+      reading.delta.textContent = formatChange.format(change);
+      reading.timeout = setTimeout(() => {
+        delete reading.metric.dataset.change;
+        reading.delta.textContent = '';
+      }, 4000);
+    }
   }
 }
 

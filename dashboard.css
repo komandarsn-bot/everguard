@@ -38,13 +38,16 @@ h1 { margin: 0 0 30px; font-size: clamp(1.75rem, 3.5vw, 2.65rem); letter-spacing
 h2 { margin: 0; font-size: 1rem; font-weight: 680; }
 small { color: var(--muted); font-size: .77rem; }
 .metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.metric { padding: 22px clamp(16px, 2.4vw, 26px) 26px; min-width: 0; }
+.metric { padding: 22px clamp(16px, 2.4vw, 26px) 22px; min-width: 0; transition: background-color .2s ease; }
 .metric + .metric { border-left: 1px solid var(--line); }
 h3 { margin: 0 0 14px; color: var(--muted); font-size: .88rem; font-weight: 600; line-height: 1.4; }
 h3 span { font-weight: 400; margin-left: 5px; }
-.reading { display: flex; align-items: baseline; flex-wrap: wrap; gap: 3px 8px; }
+.reading { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 6px; white-space: nowrap; }
 output { font-size: clamp(1.72rem, 4.5vw, 3.05rem); line-height: 1; font-variant-numeric: tabular-nums; font-weight: 650; letter-spacing: -.045em; }
 .unit { font-size: .83rem; color: #315b88; font-weight: 650; }
+.delta { display: block; min-height: 1.4em; margin-top: 8px; font-size: .8rem; font-weight: 650; font-variant-numeric: tabular-nums; }
+[data-change="up"] { color: #155e45; background-color: #eaf7ef; }
+[data-change="down"] { color: #275a95; background-color: #edf4fd; }
 @media (max-width: 760px) {
   .layout { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; }
   .station { padding: 18px 20px; }
@@ -52,6 +55,10 @@ output { font-size: clamp(1.72rem, 4.5vw, 3.05rem); line-height: 1; font-variant
   .status-panel { margin-top: 13px; }
   .workspace { padding: 26px 16px 36px; }
   h1 { margin-bottom: 19px; }
-  .metric { padding-block: 17px 20px; }
+  .metric { padding: 17px clamp(10px, 3.5vw, 20px) 14px; }
+  h3 { min-height: 2.8em; margin-bottom: 9px; }
   h3 span { display: block; margin-left: 0; }
+  output { font-size: clamp(1.42rem, 6vw, 2.65rem); }
+  .unit { font-size: .72rem; }
 }
+@media (prefers-reduced-motion: reduce) { .metric { transition: none; } }
