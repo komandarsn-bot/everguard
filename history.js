@@ -1,7 +1,7 @@
 const units = { temperature: '°C', humidity: '%', mq2: 'АЦП', mq135: 'АЦП' };
 const number = new Intl.NumberFormat('ru-KZ', { maximumFractionDigits: 2 });
 const hour = 3600000;
-const gapThreshold = 120000;
+const gapThreshold = 60000;
 const axisTime = new Intl.DateTimeFormat('ru-KZ', { hour: '2-digit', minute: '2-digit' });
 const pointTime = new Intl.DateTimeFormat('ru-KZ', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
@@ -63,6 +63,17 @@ export function mountHistory(connection) {
     bounds = { left, right };
     const x = (time) => left + (time - start) / (end - start) * (right - left);
     const y = (value) => bottom - (value - low) / (high - low) * (bottom - top);
+    const gapEdges = new Set();
+    context.fillStyle = '#fff0d7';
+    for (let i = 1; i < points.length; i++) {
+      const previous = points[i - 1];
+      const current = points[i];
+      if (current.time - previous.time <= gapThreshold) continue;
+      const gapStart = x(previous.time);
+      context.fillRect(gapStart, top, x(current.time) - gapStart, bottom - top);
+      gapEdges.add(previous);
+      gapEdges.add(current);
+    }
 
     context.font = '11px system-ui, sans-serif';
     context.fillStyle = '#526172';
@@ -94,26 +105,11 @@ export function mountHistory(connection) {
       else context.lineTo(x(time), y(value));
     });
     context.stroke();
-    context.strokeStyle = '#a85a15';
-    context.setLineDash([5, 4]);
-    context.beginPath();
-    for (let i = 1; i < points.length; i++) {
-      const previous = points[i - 1];
-      const current = points[i];
-      if (current.time - previous.time <= gapThreshold) continue;
-      context.moveTo(x(previous.time), y(previous.value));
-      context.lineTo(x(current.time), y(current.value));
-    }
-    context.stroke();
-    context.setLineDash([]);
-
-    if (points.length <= 90) {
-      context.fillStyle = '#2865a6';
-      for (const point of points) {
-        context.beginPath();
-        context.arc(x(point.time), y(point.value), 2.5, 0, Math.PI * 2);
-        context.fill();
-      }
+    context.fillStyle = '#2865a6';
+    for (const point of points.length <= 90 ? points : gapEdges) {
+      context.beginPath();
+      context.arc(x(point.time), y(point.value), gapEdges.has(point) ? 4 : 2.5, 0, Math.PI * 2);
+      context.fill();
     }
 
     const current = points[selected] ?? points.at(-1);
