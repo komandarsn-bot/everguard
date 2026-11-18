@@ -1,8 +1,23 @@
 const units = { temperature: '°C', humidity: '%', mq2: 'АЦП', mq135: 'АЦП' };
 const number = new Intl.NumberFormat('ru-KZ', { maximumFractionDigits: 2 });
 const hour = 3600000;
+const gapThreshold = 120000;
 const axisTime = new Intl.DateTimeFormat('ru-KZ', { hour: '2-digit', minute: '2-digit' });
 const pointTime = new Intl.DateTimeFormat('ru-KZ', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+function makeScale(min, max, integer) {
+  const margin = min === max ? Math.max(Math.abs(min) * 0.05, integer ? 1 : 0.25) : 0;
+  const lower = integer && min >= 0 ? Math.max(0, min - margin) : min - margin;
+  const upper = max + margin;
+  const rough = Math.max((upper - lower) / 4, integer ? 1 : 0.01);
+  const power = 10 ** Math.floor(Math.log10(rough));
+  const step = [1, 2, 2.5, 5, 10].map((factor) => factor * power)
+    .find((candidate) => candidate >= rough && (!integer || Number.isInteger(candidate)));
+  const first = Math.floor(lower / step);
+  const last = Math.ceil(upper / step);
+  const ticks = Array.from({ length: last - first + 1 }, (_, i) => Number(((first + i) * step).toPrecision(12)));
+  return { low: ticks[0], high: ticks.at(-1), ticks };
+}
 
 export function mountHistory(connection) {
   const sensor = document.querySelector('#history-sensor');
@@ -40,9 +55,7 @@ export function mountHistory(connection) {
       min = Math.min(min, value);
       max = Math.max(max, value);
     }
-    const pad = Math.max((max - min) * 0.12, sensor.value.startsWith('mq') ? 1 : 0.25);
-    const low = min - pad;
-    const high = max + pad;
+    const { low, high, ticks: valueTicks } = makeScale(min, max, sensor.value.startsWith('mq'));
     const left = 53;
     const right = width - 20;
     const top = 14;
@@ -56,8 +69,7 @@ export function mountHistory(connection) {
     context.strokeStyle = '#e2e8ef';
     context.textAlign = 'right';
     context.textBaseline = 'middle';
-    for (let i = 0; i <= 4; i++) {
-      const value = low + (high - low) * i / 4;
+    for (const value of valueTicks) {
       const lineY = y(value);
       context.beginPath();
       context.moveTo(left, lineY);
@@ -78,10 +90,22 @@ export function mountHistory(connection) {
     context.lineWidth = 1.7;
     context.beginPath();
     points.forEach(({ time, value }, i) => {
-      if (i === 0 || time - points[i - 1].time > 120000) context.moveTo(x(time), y(value));
+      if (i === 0 || time - points[i - 1].time > gapThreshold) context.moveTo(x(time), y(value));
       else context.lineTo(x(time), y(value));
     });
     context.stroke();
+    context.strokeStyle = '#a85a15';
+    context.setLineDash([5, 4]);
+    context.beginPath();
+    for (let i = 1; i < points.length; i++) {
+      const previous = points[i - 1];
+      const current = points[i];
+      if (current.time - previous.time <= gapThreshold) continue;
+      context.moveTo(x(previous.time), y(previous.value));
+      context.lineTo(x(current.time), y(current.value));
+    }
+    context.stroke();
+    context.setLineDash([]);
 
     if (points.length <= 90) {
       context.fillStyle = '#2865a6';

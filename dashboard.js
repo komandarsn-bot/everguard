@@ -1,4 +1,4 @@
-import { mountHistory } from './history.js?v=history';
+import { mountHistory } from './history.js?v=scale';
 
 const status = document.querySelector('#status');
 const panel = document.querySelector('#status-panel');

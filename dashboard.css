@@ -75,6 +75,8 @@ output { font-size: clamp(1.72rem, 4.5vw, 3.05rem); line-height: 1; font-variant
 #history-message { position: absolute; inset: 50% 12px auto; transform: translateY(-50%); text-align: center; margin: 0; color: var(--muted); font-size: .88rem; pointer-events: none; }
 .history-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; margin-top: 12px; color: var(--muted); font-size: .77rem; min-height: 1.2em; }
 #history-point { color: #274e79; font: inherit; font-weight: 600; letter-spacing: normal; }
+.history-legend { display: flex; align-items: center; gap: 7px; margin: 8px 0 0; color: var(--muted); font-size: .75rem; }
+.history-legend span { flex: 0 0 22px; border-top: 2px dashed #a85a15; }
 @media (max-width: 460px) {
   .history-controls label { flex: 1 1 135px; }
   .history-controls select { min-width: 0; min-height: 36px; }
