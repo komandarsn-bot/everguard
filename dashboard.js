@@ -1,4 +1,4 @@
-import { mountHistory } from './history.js?v=gaps';
+import { mountHistory } from './history.js?v=curve';
 
 const status = document.querySelector('#status');
 const panel = document.querySelector('#status-panel');

@@ -100,10 +100,17 @@ export function mountHistory(connection) {
     context.strokeStyle = '#2865a6';
     context.lineWidth = 1.7;
     context.beginPath();
-    points.forEach(({ time, value }, i) => {
-      if (i === 0 || time - points[i - 1].time > gapThreshold) context.moveTo(x(time), y(value));
-      else context.lineTo(x(time), y(value));
-    });
+    context.moveTo(x(points[0].time), y(points[0].value));
+    for (let i = 1; i < points.length; i++) {
+      const previous = points[i - 1];
+      const current = points[i];
+      const fromX = x(previous.time);
+      const toX = x(current.time);
+      const fromY = y(previous.value);
+      const toY = y(current.value);
+      const handle = (toX - fromX) / 3;
+      context.bezierCurveTo(fromX + handle, fromY, toX - handle, toY, toX, toY);
+    }
     context.stroke();
     context.fillStyle = '#2865a6';
     for (const point of points.length <= 90 ? points : gapEdges) {
