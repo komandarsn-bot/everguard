@@ -40,8 +40,8 @@ small { color: var(--muted); font-size: .77rem; }
 .metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .metric { padding: 22px clamp(16px, 2.4vw, 26px) 22px; min-width: 0; transition: background-color .2s ease; }
 .metric + .metric { border-left: 1px solid var(--line); }
-h3 { margin: 0 0 14px; color: var(--muted); font-size: .88rem; font-weight: 600; line-height: 1.4; }
-h3 span { font-weight: 400; margin-left: 5px; }
+h3 { margin: 0; color: #192331; font-size: .88rem; font-weight: 650; line-height: 1.4; }
+.metric-description { min-height: 2.7em; margin: 3px 0 9px; color: var(--muted); font-size: .75rem; line-height: 1.35; }
 .reading { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 6px; white-space: nowrap; }
 output { font-size: clamp(1.72rem, 4.5vw, 3.05rem); line-height: 1; font-variant-numeric: tabular-nums; font-weight: 650; letter-spacing: -.045em; }
 .unit { font-size: .83rem; color: #315b88; font-weight: 650; }
@@ -56,8 +56,7 @@ output { font-size: clamp(1.72rem, 4.5vw, 3.05rem); line-height: 1; font-variant
   .workspace { padding: 26px 16px 36px; }
   h1 { margin-bottom: 19px; }
   .metric { padding: 17px clamp(10px, 3.5vw, 20px) 14px; }
-  h3 { min-height: 2.8em; margin-bottom: 9px; }
-  h3 span { display: block; margin-left: 0; }
+  .metric-description { min-height: 2.7em; }
   output { font-size: clamp(1.42rem, 6vw, 2.65rem); }
   .unit { font-size: .72rem; }
 }

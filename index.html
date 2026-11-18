@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#171f2b">
   <title>EVERGUARD — показания станции</title>
-  <link rel="stylesheet" href="./dashboard.css?v=tooltip">
+  <link rel="stylesheet" href="./dashboard.css?v=sensor-labels">
   <script type="module" src="./dashboard.js?v=tooltip"></script>
 </head>
 <body>
@@ -28,10 +28,12 @@
           <div class="metrics">
             <div class="metric">
               <h3>Температура</h3>
+              <p class="metric-description">Нагрев воздуха</p>
               <div class="reading"><output id="temperature" aria-label="Температура в градусах Цельсия">—</output><span class="unit">°C</span></div>
             </div>
             <div class="metric">
               <h3>Влажность</h3>
+              <p class="metric-description">Относительная влажность воздуха</p>
               <div class="reading"><output id="humidity" aria-label="Влажность в процентах">—</output><span class="unit">%</span></div>
             </div>
           </div>
@@ -40,11 +42,13 @@
           <div class="group-heading"><h2 id="air">Датчики воздуха</h2><small>Сырые показания АЦП</small></div>
           <div class="metrics">
             <div class="metric">
-              <h3>MQ‑2 <span>Дым и газ</span></h3>
+              <h3>MQ‑2</h3>
+              <p class="metric-description">Дым и горючие газы</p>
               <div class="reading"><output id="mq2" aria-label="Показание MQ-2">—</output><span class="unit">АЦП</span></div>
             </div>
             <div class="metric">
               <h3>MQ‑135</h3>
+              <p class="metric-description">Аммиак, пары и дым</p>
               <div class="reading"><output id="mq135" aria-label="Показание MQ-135">—</output><span class="unit">АЦП</span></div>
             </div>
           </div>
