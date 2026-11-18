@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#171f2b">
   <title>EVERGUARD — показания станции</title>
-  <link rel="stylesheet" href="./dashboard.css?v=gaps">
-  <script type="module" src="./dashboard.js?v=sequence"></script>
+  <link rel="stylesheet" href="./dashboard.css?v=tooltip">
+  <script type="module" src="./dashboard.js?v=tooltip"></script>
 </head>
 <body>
   <div class="layout">
@@ -73,6 +73,10 @@
           </div>
           <div class="history-plot" id="history-plot">
             <canvas id="history-chart" aria-label="График показаний. Стрелки влево и вправо выбирают запись." tabindex="0"></canvas>
+            <div id="history-tooltip" class="history-tooltip" aria-hidden="true" hidden>
+              <span id="history-tooltip-time"></span>
+              <strong id="history-tooltip-value"></strong>
+            </div>
             <p id="history-message" role="status">Загружаем историю…</p>
           </div>
           <div class="history-foot">

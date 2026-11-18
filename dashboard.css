@@ -72,6 +72,9 @@ output { font-size: clamp(1.72rem, 4.5vw, 3.05rem); line-height: 1; font-variant
 .history-refresh:hover { background: #f1f6fb; }
 .history-plot { position: relative; border: 1px solid var(--line); border-radius: 6px; background: #fafbfd; }
 .history-plot canvas { display: block; width: 100%; height: clamp(200px, 29vw, 290px); touch-action: pan-y; }
+.history-tooltip { position: absolute; z-index: 1; pointer-events: none; max-width: calc(100% - 16px); padding: 7px 10px; border-radius: 6px; background: #171f2b; color: #fff; font-size: .74rem; line-height: 1.35; font-variant-numeric: tabular-nums; }
+.history-tooltip span { display: block; color: #d2dbe6; }
+.history-tooltip strong { display: block; margin-top: 2px; font-size: .9rem; }
 #history-message { position: absolute; inset: 50% 12px auto; transform: translateY(-50%); text-align: center; margin: 0; color: var(--muted); font-size: .88rem; pointer-events: none; }
 .history-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; margin-top: 12px; color: var(--muted); font-size: .77rem; min-height: 1.2em; }
 #history-point { color: #274e79; font: inherit; font-weight: 600; letter-spacing: normal; }

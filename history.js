@@ -2,7 +2,7 @@ const units = { temperature: '°C', humidity: '%', mq2: 'АЦП', mq135: 'АЦП
 const number = new Intl.NumberFormat('ru-KZ', { maximumFractionDigits: 2 });
 const hour = 3600000;
 const gapThreshold = 60000;
-const pointTime = new Intl.DateTimeFormat('ru-KZ', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+const pointTime = new Intl.DateTimeFormat('ru-KZ', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
 function makeScale(min, max, integer) {
   const margin = min === max ? Math.max(Math.abs(min) * 0.05, integer ? 1 : 0.25) : 0;
@@ -27,6 +27,9 @@ export function mountHistory(connection) {
   const message = document.querySelector('#history-message');
   const summary = document.querySelector('#history-summary');
   const detail = document.querySelector('#history-point');
+  const tooltip = document.querySelector('#history-tooltip');
+  const tooltipTime = document.querySelector('#history-tooltip-time');
+  const tooltipValue = document.querySelector('#history-tooltip-value');
   let points = [];
   let selected = -1;
   let start;
@@ -39,6 +42,7 @@ export function mountHistory(connection) {
   let lastId;
 
   function draw() {
+    tooltip.hidden = true;
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
     if (!width || !height || !context) return;
@@ -138,7 +142,20 @@ export function mountHistory(connection) {
     context.arc(pointX, pointY, 4, 0, Math.PI * 2);
     context.fill();
     summary.textContent = 'Мин. ' + number.format(min) + ' · Макс. ' + number.format(max) + ' ' + unit;
-    detail.textContent = pointTime.format(current.time) + ' · ' + number.format(current.value) + ' ' + unit;
+    const time = pointTime.format(current.time);
+    const value = number.format(current.value) + ' ' + unit;
+    detail.textContent = time + ' · ' + value;
+    if (selected >= 0) {
+      tooltipTime.textContent = time;
+      tooltipValue.textContent = value;
+      tooltip.hidden = false;
+      const inset = 8;
+      const boxWidth = tooltip.offsetWidth;
+      const boxHeight = tooltip.offsetHeight;
+      tooltip.style.left = Math.max(inset, Math.min(width - boxWidth - inset, pointX + 12)) + 'px';
+      const above = pointY - boxHeight - 10;
+      tooltip.style.top = (above >= inset ? above : Math.min(height - boxHeight - inset, pointY + 12)) + 'px';
+    }
   }
 
   async function load() {

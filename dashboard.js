@@ -1,4 +1,4 @@
-import { mountHistory } from './history.js?v=sequence';
+import { mountHistory } from './history.js?v=tooltip';
 
 const status = document.querySelector('#status');
 const panel = document.querySelector('#status-panel');
