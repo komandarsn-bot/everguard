@@ -1,8 +1,16 @@
 const status = document.querySelector('#status');
+const panel = document.querySelector('#status-panel');
+const label = document.querySelector('#status-label');
 const fields = ['temperature', 'humidity', 'mq2', 'mq135'];
 let settingsVersion = 0;
 let updatedAt;
 let timer;
+
+function showStatus(state, title, detail) {
+  panel.dataset.state = state;
+  label.textContent = title;
+  if (status.textContent !== detail) status.textContent = detail;
+}
 
 function render(row) {
   for (const field of fields) {
@@ -29,14 +37,18 @@ async function refresh(connection, version) {
     render(row);
     updatedAt = row?.recorded_at;
     const time = updatedAt && new Date(updatedAt);
-    status.textContent = time
-      ? (Date.now() - time.getTime() > 90000 ? 'Давно не было новых данных · ' : 'Последняя запись · ') + time.toLocaleString('ru-KZ')
-      : 'В базе пока нет показаний.';
+    if (!time) {
+      showStatus('loading', 'Ожидание данных', 'В базе пока нет показаний.');
+    } else {
+      const stale = Date.now() - time.getTime() > 90000;
+      showStatus(stale ? 'stale' : 'live', stale ? 'Нет свежих данных' : 'Данные поступают',
+        'Последняя запись · ' + time.toLocaleString('ru-KZ'));
+    }
   } catch {
     if (version !== settingsVersion) return;
-    status.textContent = updatedAt
+    showStatus('error', 'Ошибка подключения', updatedAt
       ? 'Нет связи с базой · последняя запись ' + new Date(updatedAt).toLocaleString('ru-KZ')
-      : 'Не удалось загрузить показания. Повторяем запрос…';
+      : 'Не удалось загрузить показания. Повторяем запрос…');
   } finally {
     if (version === settingsVersion) timer = setTimeout(() => refresh(connection, version), 5000);
   }
