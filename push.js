@@ -2,6 +2,7 @@ export async function mountPush(connection) {
   if (!('serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window)) return;
   const controls = document.querySelector('#push-controls');
   const button = document.querySelector('#push-button');
+  const testButton = document.querySelector('#push-test');
   const status = document.querySelector('#push-status');
   const endpoint = new URL('/functions/v1/sensor-push/', connection.project);
 
@@ -11,31 +12,58 @@ export async function mountPush(connection) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(subscription),
     });
+    return response;
+  }
+
+  async function save(action, subscription) {
+    const response = await send(action, subscription);
     if (!response.ok) throw new Error('Push HTTP ' + response.status);
   }
 
   try {
     const config = await fetch(new URL('public-key', endpoint), { signal: AbortSignal.timeout(6000) });
     if (!config.ok) return;
-    const { publicKey } = await config.json();
+    const { publicKey, testSupported } = await config.json();
     const registration = await navigator.serviceWorker.register('./push-worker.js');
     const ready = await navigator.serviceWorker.ready;
     let subscription = await ready.pushManager.getSubscription();
 
     function render() {
       button.textContent = subscription ? 'Отключить уведомления' : 'Включить уведомления';
+      testButton.hidden = !subscription || !testSupported;
     }
 
-    if (subscription) await send('subscribe', subscription);
+    if (subscription) await save('subscribe', subscription);
     render();
     controls.hidden = false;
+    testButton.addEventListener('click', async () => {
+      if (!subscription) return;
+      testButton.disabled = true;
+      button.disabled = true;
+      status.textContent = 'Отправляем тестовое уведомление…';
+      try {
+        const response = await send('test', subscription);
+        if (response.status === 429) {
+          status.textContent = 'Перед следующим тестом подождите минуту.';
+          return;
+        }
+        if (!response.ok) throw new Error('Push HTTP ' + response.status);
+        status.textContent = 'Тест отправлен. Проверьте уведомления на этом устройстве.';
+      } catch {
+        status.textContent = 'Не удалось отправить тестовое уведомление.';
+      } finally {
+        testButton.disabled = false;
+        button.disabled = false;
+      }
+    });
 
     button.addEventListener('click', async () => {
       button.disabled = true;
+      testButton.disabled = true;
       status.textContent = '';
       try {
         if (subscription) {
-          await send('unsubscribe', subscription);
+          await save('unsubscribe', subscription);
           await subscription.unsubscribe();
           subscription = null;
           status.textContent = 'Уведомления отключены.';
@@ -50,7 +78,7 @@ export async function mountPush(connection) {
             userVisibleOnly: true, applicationServerKey: key,
           });
           try {
-            await send('subscribe', candidate);
+            await save('subscribe', candidate);
           } catch (error) {
             await candidate.unsubscribe();
             throw error;
@@ -63,6 +91,7 @@ export async function mountPush(connection) {
       } finally {
         render();
         button.disabled = false;
+        testButton.disabled = false;
       }
     });
   } catch {

@@ -25,8 +25,9 @@ body { margin: 0; }
 .description { margin: 4px 0 0; color: #bdc9d7; font-size: .81rem; }
 .status-panel { margin-top: 24px; }
 #push-controls { margin-top: 18px; }
-#push-button { color: #f3f6fa; background: #243347; border-color: #51647d; }
-#push-button:hover { background: #31455e; }
+#push-button, #push-test { color: #f3f6fa; background: #243347; border-color: #51647d; }
+#push-button:hover, #push-test:hover { background: #31455e; }
+#push-test { margin-top: 7px; }
 #push-status { margin: 8px 0 0; color: #bdc9d7; font-size: .8rem; line-height: 1.5; }
 #push-status:empty { display: none; }
 .status-label { display: inline-flex; align-items: center; gap: 9px; font-size: .89rem; font-weight: 650; }

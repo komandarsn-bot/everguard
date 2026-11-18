@@ -1,5 +1,5 @@
 import { mountHistory } from './history.js?v=full-history';
-import { mountPush } from './push.js';
+import { mountPush } from './push.js?v=test';
 
 const status = document.querySelector('#status');
 const panel = document.querySelector('#status-panel');
