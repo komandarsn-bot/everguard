@@ -1,7 +1,6 @@
 const units = { temperature: '°C', humidity: '%', mq2: 'АЦП', mq135: 'АЦП' };
 const number = new Intl.NumberFormat('ru-KZ', { maximumFractionDigits: 2 });
 const minute = 60000;
-const sampleCount = 24;
 const gapThreshold = 60000;
 const pointTime = new Intl.DateTimeFormat('ru-KZ', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
@@ -31,8 +30,6 @@ export function mountHistory(connection) {
   const tooltip = document.querySelector('#history-tooltip');
   const tooltipTime = document.querySelector('#history-tooltip-time');
   const tooltipValue = document.querySelector('#history-tooltip-value');
-  const gapNote = document.querySelector('#history-gap-note');
-  const sampleNote = document.querySelector('#history-sample-note');
   let points = [];
   let selected = -1;
   let start;
@@ -43,7 +40,6 @@ export function mountHistory(connection) {
   let latest;
   let loaded = false;
   let lastId;
-  let sampled = false;
 
   function draw() {
     tooltip.hidden = true;
@@ -76,7 +72,7 @@ export function mountHistory(connection) {
     for (let i = 1; i < points.length; i++) {
       const previous = points[i - 1];
       const current = points[i];
-      if (sampled || current.time - previous.time <= gapThreshold) continue;
+      if (current.time - previous.time <= gapThreshold) continue;
       const gapStart = x(i - 1);
       const gapWidth = x(i) - gapStart;
       const markerWidth = Math.max(2, Math.min(8, gapWidth));
@@ -145,7 +141,7 @@ export function mountHistory(connection) {
     context.beginPath();
     context.arc(pointX, pointY, 4, 0, Math.PI * 2);
     context.fill();
-    summary.textContent = 'Мин. ' + number.format(min) + ' · Макс. ' + number.format(max) + ' ' + unit;
+    summary.textContent = 'Замеров: ' + number.format(points.length) + ' · Мин. ' + number.format(min) + ' · Макс. ' + number.format(max) + ' ' + unit;
     const time = pointTime.format(current.time);
     const value = number.format(current.value) + ' ' + unit;
     detail.textContent = time + ' · ' + value;
@@ -170,12 +166,8 @@ export function mountHistory(connection) {
     const column = sensor.value;
     unit = units[column];
     end = Date.now();
-    const until = end;
     const duration = Number(range.value) * minute;
     start = Number.isFinite(duration) ? end - duration : 0;
-    sampled = range.value === 'all' || duration > 1440 * minute;
-    gapNote.style.display = sampled ? 'none' : '';
-    sampleNote.hidden = !sampled;
     points = [];
     selected = -1;
     bounds = undefined;
@@ -204,38 +196,12 @@ export function mountHistory(connection) {
       return response.json();
     }
     try {
-      if (sampled) {
-        const earliest = new URL(endpoint);
-        earliest.searchParams.set('order', 'id.asc');
-        earliest.searchParams.set('limit', '1');
-        const [first] = await getPage(earliest);
-        if (first) {
-          rows.push(first);
-          const from = Date.parse(first.recorded_at);
-          const edge = (index) => from + Math.floor((until + 1 - from) * index / sampleCount);
-          for (let offset = 0; offset < sampleCount && !active.signal.aborted; offset += 4) {
-            const pages = await Promise.all(Array.from({ length: 4 }, (_, i) => {
-              const lower = edge(offset + i);
-              const upper = edge(offset + i + 1);
-              if (upper <= lower) return [];
-              const bucket = new URL(endpoint);
-              bucket.searchParams.delete('recorded_at');
-              bucket.searchParams.append('recorded_at', 'gte.' + new Date(lower).toISOString());
-              bucket.searchParams.append('recorded_at', 'lt.' + new Date(upper).toISOString());
-              bucket.searchParams.set('limit', '1');
-              return getPage(bucket);
-            }));
-            for (const [row] of pages) if (row && row.id !== first.id) rows.push(row);
-          }
-        }
-      } else {
-        while (!active.signal.aborted) {
-          const page = await getPage(endpoint);
-          if (active.signal.aborted) return;
-          rows.push(...page);
-          if (page.length < 1000) break;
-          endpoint.searchParams.set('id', 'lt.' + page.at(-1).id);
-        }
+      while (!active.signal.aborted) {
+        const page = await getPage(endpoint);
+        if (active.signal.aborted) return;
+        rows.push(...page);
+        if (page.length < 1000) break;
+        endpoint.searchParams.set('id', 'lt.' + page.at(-1).id);
       }
       if (active.signal.aborted) return;
       points = rows.filter((row) => row[column] != null).map((row) => ({
@@ -244,7 +210,7 @@ export function mountHistory(connection) {
         value: Number(row[column]),
       })).filter(({ time, value }) => Number.isFinite(time) && Number.isFinite(value))
         .sort((a, b) => a.time - b.time);
-      lastId = rows.reduce((max, row) => max == null || row.id > max ? row.id : max, undefined);
+      lastId = rows[0]?.id;
       loaded = true;
       message.hidden = points.length > 0;
       message.textContent = points.length ? '' : 'За выбранный период записей нет.';

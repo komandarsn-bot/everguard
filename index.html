@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#171f2b">
   <title>EVERGUARD — показания станции</title>
   <link rel="stylesheet" href="./dashboard.css?v=sensor-labels">
-  <script type="module" src="./dashboard.js?v=ranges"></script>
+  <script type="module" src="./dashboard.js?v=full-history"></script>
 </head>
 <body>
   <div class="layout">
@@ -92,8 +92,7 @@
             <output id="history-point"></output>
           </div>
           <p class="history-legend">Ось X — номер замера в выбранном периоде</p>
-          <p class="history-legend" id="history-gap-note"><span aria-hidden="true"></span>Пауза больше минуты</p>
-          <p id="history-sample-note" hidden><small>Выборка замеров за весь период. Минимум и максимум рассчитаны по точкам графика.</small></p>
+          <p class="history-legend"><span aria-hidden="true"></span>Пауза больше минуты</p>
         </section>
       </div>
     </main>
