@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#171f2b">
   <title>EVERGUARD — показания станции</title>
-  <link rel="stylesheet" href="./dashboard.css?v=readings">
-  <script type="module" src="./dashboard.js?v=readings"></script>
+  <link rel="stylesheet" href="./dashboard.css?v=history">
+  <script type="module" src="./dashboard.js?v=history"></script>
 </head>
 <body>
   <div class="layout">
@@ -47,6 +47,37 @@
               <h3>MQ‑135</h3>
               <div class="reading"><output id="mq135" aria-label="Показание MQ-135">—</output><span class="unit">АЦП</span></div>
             </div>
+          </div>
+        </section>
+        <section class="group history" aria-labelledby="history-title">
+          <div class="history-heading">
+            <h2 id="history-title">История показаний</h2>
+            <button class="history-refresh" id="history-refresh" type="button">Обновить график</button>
+          </div>
+          <div class="history-controls">
+            <label>Датчик
+              <select id="history-sensor">
+                <option value="temperature">Температура</option>
+                <option value="humidity">Влажность</option>
+                <option value="mq2">MQ‑2 · Дым и газ</option>
+                <option value="mq135">MQ‑135</option>
+              </select>
+            </label>
+            <label>Период
+              <select id="history-range">
+                <option value="1">Последний час</option>
+                <option value="6">Последние 6 часов</option>
+                <option value="24">Последние 24 часа</option>
+              </select>
+            </label>
+          </div>
+          <div class="history-plot" id="history-plot">
+            <canvas id="history-chart" aria-label="График показаний. Стрелки влево и вправо выбирают запись." tabindex="0"></canvas>
+            <p id="history-message" role="status">Загружаем историю…</p>
+          </div>
+          <div class="history-foot">
+            <span id="history-summary"></span>
+            <output id="history-point"></output>
           </div>
         </section>
       </div>

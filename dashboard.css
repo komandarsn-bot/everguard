@@ -62,3 +62,20 @@ output { font-size: clamp(1.72rem, 4.5vw, 3.05rem); line-height: 1; font-variant
   .unit { font-size: .72rem; }
 }
 @media (prefers-reduced-motion: reduce) { .metric { transition: none; } }
+
+.history { margin-top: 24px; padding: clamp(16px, 2.4vw, 26px); }
+.history-heading { display: flex; justify-content: space-between; align-items: center; gap: 8px 16px; flex-wrap: wrap; }
+.history-controls { display: flex; flex-wrap: wrap; gap: 10px 14px; margin: 18px 0 14px; }
+.history-controls label { display: grid; gap: 5px; font-size: .78rem; color: var(--muted); }
+.history-controls select, .history-refresh { color: #192331; background: #fff; border: 1px solid #b4c1ce; border-radius: 6px; padding: 7px 10px; font: inherit; }
+.history-refresh { font-size: .8rem; cursor: pointer; }
+.history-refresh:hover { background: #f1f6fb; }
+.history-plot { position: relative; border: 1px solid var(--line); border-radius: 6px; background: #fafbfd; }
+.history-plot canvas { display: block; width: 100%; height: clamp(200px, 29vw, 290px); touch-action: pan-y; }
+#history-message { position: absolute; inset: 50% 12px auto; transform: translateY(-50%); text-align: center; margin: 0; color: var(--muted); font-size: .88rem; pointer-events: none; }
+.history-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; margin-top: 12px; color: var(--muted); font-size: .77rem; min-height: 1.2em; }
+#history-point { color: #274e79; font: inherit; font-weight: 600; letter-spacing: normal; }
+@media (max-width: 460px) {
+  .history-controls label { flex: 1 1 135px; }
+  .history-controls select { min-width: 0; min-height: 36px; }
+}

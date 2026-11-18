@@ -1,3 +1,5 @@
+import { mountHistory } from './history.js?v=history';
+
 const status = document.querySelector('#status');
 const panel = document.querySelector('#status-panel');
 const label = document.querySelector('#status-label');
@@ -15,6 +17,7 @@ const readings = fields.map((field) => {
 let settingsVersion = 0;
 let updatedAt;
 let timer;
+let updateHistory;
 
 function showStatus(state, title, detail) {
   panel.dataset.state = state;
@@ -49,7 +52,7 @@ async function refresh(connection, version) {
   try {
     const endpoint = new URL('/rest/v1/sensor_readings', connection.project);
     endpoint.search = new URLSearchParams({
-      select: [...fields, 'recorded_at'].join(','),
+      select: ['id', ...fields, 'recorded_at'].join(','),
       order: 'id.desc',
       limit: '1',
     });
@@ -62,6 +65,7 @@ async function refresh(connection, version) {
     const [row] = await response.json();
     if (version !== settingsVersion) return;
     render(row);
+    if (row) updateHistory?.(row);
     updatedAt = row?.recorded_at;
     const time = updatedAt && new Date(updatedAt);
     if (!time) {
@@ -89,7 +93,9 @@ function connect(connection) {
   refresh(connection, ++settingsVersion);
 }
 
-connect({
+const connection = {
   project: 'https://zddwdjlwqmlysegxrruz.supabase.co',
   key: 'sb_publishable_Ic_mUoZn5-WywZesME_j4w_8-8T46Tq',
-});
+};
+updateHistory = mountHistory(connection);
+connect(connection);
