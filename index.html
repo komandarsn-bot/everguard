@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#171f2b">
   <title>EVERGUARD — показания станции</title>
-  <link rel="stylesheet" href="./dashboard.css?v=sensor-labels">
-  <script type="module" src="./dashboard.js?v=full-history"></script>
+  <link rel="stylesheet" href="./dashboard.css?v=push">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <script type="module" src="./dashboard.js?v=push"></script>
 </head>
 <body>
   <div class="layout">
@@ -18,6 +19,10 @@
       <div class="status-panel" id="status-panel" data-state="loading">
         <span class="status-label"><span class="status-dot" aria-hidden="true"></span><span id="status-label">Подключение</span></span>
         <p id="status" role="status">Загружаем показания…</p>
+      </div>
+      <div id="push-controls" hidden>
+        <button class="history-refresh" id="push-button" type="button">Включить уведомления</button>
+        <p id="push-status" role="status"></p>
       </div>
     </header>
     <main class="workspace">

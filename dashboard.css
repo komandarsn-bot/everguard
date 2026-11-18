@@ -24,6 +24,11 @@ body { margin: 0; }
 .brand { margin: 0; font-size: .98rem; letter-spacing: .14em; font-weight: 750; }
 .description { margin: 4px 0 0; color: #bdc9d7; font-size: .81rem; }
 .status-panel { margin-top: 24px; }
+#push-controls { margin-top: 18px; }
+#push-button { color: #f3f6fa; background: #243347; border-color: #51647d; }
+#push-button:hover { background: #31455e; }
+#push-status { margin: 8px 0 0; color: #bdc9d7; font-size: .8rem; line-height: 1.5; }
+#push-status:empty { display: none; }
 .status-label { display: inline-flex; align-items: center; gap: 9px; font-size: .89rem; font-weight: 650; }
 .status-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; background: #9cabbc; }
 [data-state="live"] .status-dot { background: #75d5ab; }

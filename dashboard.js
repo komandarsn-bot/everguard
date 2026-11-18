@@ -1,4 +1,5 @@
 import { mountHistory } from './history.js?v=full-history';
+import { mountPush } from './push.js';
 
 const status = document.querySelector('#status');
 const panel = document.querySelector('#status-panel');
@@ -99,3 +100,4 @@ const connection = {
 };
 updateHistory = mountHistory(connection);
 connect(connection);
+mountPush(connection);

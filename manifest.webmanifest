@@ -1,0 +1,11 @@
+{
+  "id": "./",
+  "name": "EVERGUARD",
+  "short_name": "EVERGUARD",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "theme_color": "#171f2b",
+  "background_color": "#f4f5f7"
+}
+
