@@ -2,7 +2,6 @@ const units = { temperature: '°C', humidity: '%', mq2: 'АЦП', mq135: 'АЦП
 const number = new Intl.NumberFormat('ru-KZ', { maximumFractionDigits: 2 });
 const hour = 3600000;
 const gapThreshold = 60000;
-const axisTime = new Intl.DateTimeFormat('ru-KZ', { hour: '2-digit', minute: '2-digit' });
 const pointTime = new Intl.DateTimeFormat('ru-KZ', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
 function makeScale(min, max, integer) {
@@ -61,7 +60,8 @@ export function mountHistory(connection) {
     const top = 14;
     const bottom = height - 32;
     bounds = { left, right };
-    const x = (time) => left + (time - start) / (end - start) * (right - left);
+    const lastIndex = points.length - 1;
+    const x = (index) => lastIndex ? left + index / lastIndex * (right - left) : (left + right) / 2;
     const y = (value) => bottom - (value - low) / (high - low) * (bottom - top);
     const gapEdges = new Set();
     context.fillStyle = '#fff0d7';
@@ -69,10 +69,12 @@ export function mountHistory(connection) {
       const previous = points[i - 1];
       const current = points[i];
       if (current.time - previous.time <= gapThreshold) continue;
-      const gapStart = x(previous.time);
-      context.fillRect(gapStart, top, x(current.time) - gapStart, bottom - top);
-      gapEdges.add(previous);
-      gapEdges.add(current);
+      const gapStart = x(i - 1);
+      const gapWidth = x(i) - gapStart;
+      const markerWidth = Math.max(2, Math.min(8, gapWidth));
+      context.fillRect(gapStart + (gapWidth - markerWidth) / 2, top, markerWidth, bottom - top);
+      gapEdges.add(i - 1);
+      gapEdges.add(i);
     }
 
     context.font = '11px system-ui, sans-serif';
@@ -89,23 +91,23 @@ export function mountHistory(connection) {
       context.fillText(number.format(value), left - 8, lineY, left - 10);
     }
 
-    const ticks = width < 460 ? 2 : 4;
+    const ticks = Math.min(lastIndex, width < 460 ? 2 : 4);
     context.textBaseline = 'top';
     for (let i = 0; i <= ticks; i++) {
-      const time = start + (end - start) * i / ticks;
-      context.textAlign = i === 0 ? 'left' : i === ticks ? 'right' : 'center';
-      context.fillText(axisTime.format(time), x(time), bottom + 10);
+      const index = ticks ? Math.round(lastIndex * i / ticks) : 0;
+      context.textAlign = !ticks ? 'center' : i === 0 ? 'left' : i === ticks ? 'right' : 'center';
+      context.fillText(number.format(index + 1), x(index), bottom + 10);
     }
 
     context.strokeStyle = '#2865a6';
     context.lineWidth = 1.7;
     context.beginPath();
-    context.moveTo(x(points[0].time), y(points[0].value));
+    context.moveTo(x(0), y(points[0].value));
     for (let i = 1; i < points.length; i++) {
       const previous = points[i - 1];
       const current = points[i];
-      const fromX = x(previous.time);
-      const toX = x(current.time);
+      const fromX = x(i - 1);
+      const toX = x(i);
       const fromY = y(previous.value);
       const toY = y(current.value);
       const handle = (toX - fromX) / 3;
@@ -113,14 +115,15 @@ export function mountHistory(connection) {
     }
     context.stroke();
     context.fillStyle = '#2865a6';
-    for (const point of points.length <= 90 ? points : gapEdges) {
+    const markers = points.length <= 90 ? points.keys() : gapEdges;
+    for (const index of markers) {
       context.beginPath();
-      context.arc(x(point.time), y(point.value), gapEdges.has(point) ? 4 : 2.5, 0, Math.PI * 2);
+      context.arc(x(index), y(points[index].value), gapEdges.has(index) ? 4 : 2.5, 0, Math.PI * 2);
       context.fill();
     }
 
     const current = points[selected] ?? points.at(-1);
-    const pointX = x(current.time);
+    const pointX = x(selected < 0 ? lastIndex : selected);
     const pointY = y(current.value);
     if (selected >= 0) {
       context.strokeStyle = '#8194a8';
@@ -218,15 +221,8 @@ export function mountHistory(connection) {
   function selectAt(event) {
     if (!bounds || !points.length) return;
     const offset = event.clientX - canvas.getBoundingClientRect().left;
-    const time = start + (end - start) * (offset - bounds.left) / (bounds.right - bounds.left);
-    let lo = 0;
-    let hi = points.length - 1;
-    while (lo < hi) {
-      const middle = Math.floor((lo + hi) / 2);
-      if (points[middle].time < time) lo = middle + 1;
-      else hi = middle;
-    }
-    const index = lo && time - points[lo - 1].time < points[lo].time - time ? lo - 1 : lo;
+    const ratio = (offset - bounds.left) / (bounds.right - bounds.left);
+    const index = Math.round(Math.max(0, Math.min(1, ratio)) * (points.length - 1));
     if (selected === index) return;
     selected = index;
     draw();
