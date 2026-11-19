@@ -22,13 +22,14 @@
       </div>
       <details class="station-settings">
         <summary>Настройки</summary>
-        <label for="refresh-interval">Обновлять показания</label>
+        <label for="refresh-interval">Когда появится следующий замер</label>
         <select id="refresh-interval">
-          <option value="5">Каждые 5 секунд</option>
-          <option value="10">Каждые 10 секунд</option>
-          <option value="30">Каждые 30 секунд</option>
-          <option value="60">Каждую минуту</option>
+          <option value="5">Примерно 5–10 секунд</option>
+          <option value="10">Примерно 10–20 секунд</option>
+          <option value="30">Примерно 30–60 секунд</option>
+          <option value="60">Примерно 1–2 минуты</option>
         </select>
+        <small>Оценка учитывает отправку станцией и проверку базы сайтом.</small>
         <small id="refresh-settings-status" role="status">Настройка сохраняется в этом браузере.</small>
         <div id="push-controls" hidden>
           <button class="history-refresh" id="push-button" type="button">Включить уведомления</button>
