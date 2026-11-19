@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#171f2b">
   <title>EVERGUARD — показания станции</title>
-  <link rel="stylesheet" href="./dashboard.css?v=signin">
+  <link rel="stylesheet" href="./dashboard.css?v=station-panel">
   <link rel="manifest" href="./manifest.webmanifest">
   <script type="module" src="./dashboard.js?v=station-interval"></script>
 </head>
@@ -17,12 +17,13 @@
         <div><p class="brand">EVERGUARD</p><p class="description">Станция мониторинга</p></div>
       </div>
       <div class="status-panel" id="status-panel" data-state="loading">
+        <h2 class="station-caption">Статус станции</h2>
         <span class="status-label"><span class="status-dot" aria-hidden="true"></span><span id="status-label">Подключение</span></span>
         <p id="status" role="status">Загружаем показания…</p>
       </div>
       <details class="station-settings">
         <summary>Настройки</summary>
-        <label for="refresh-interval">Когда появится следующий замер</label>
+        <label for="refresh-interval">Обновление показаний</label>
         <select id="refresh-interval">
           <option value="5">Примерно 5–10 секунд</option>
           <option value="10">Примерно 10–20 секунд</option>
@@ -32,6 +33,7 @@
         <small>Оценка учитывает отправку станцией и проверку базы сайтом.</small>
         <small id="refresh-settings-status" role="status">Настройка сохраняется в этом браузере.</small>
         <div id="push-controls" hidden>
+          <h3>Уведомления</h3>
           <button class="history-refresh" id="push-button" type="button">Включить уведомления</button>
           <button class="history-refresh" id="push-test" type="button" hidden>Отправить тест</button>
           <p id="push-status" role="status"></p>
