@@ -29,6 +29,10 @@ body { margin: 0; }
 .station-settings label { display: block; margin: 12px 0 6px; }
 .station-settings select { max-width: 100%; padding: 7px; color: #f3f6fa; background: #243347; border: 1px solid #51647d; border-radius: 6px; font: inherit; }
 .station-settings small { display: block; margin-top: 6px; color: #bdc9d7; }
+.account-form input { width: 100%; color: #f3f6fa; background: #243347; border: 1px solid #51647d; padding: 7px; border-radius: 6px; font: inherit; }
+.account-form button, .account-logout { margin-top: 10px; }
+.account-status { color: #d2dbe6; font-size: .8rem; }
+.account-status:empty { display: none; }
 #push-controls { margin-top: 18px; }
 #push-button, #push-test { color: #f3f6fa; background: #243347; border-color: #51647d; }
 #push-button:hover, #push-test:hover { background: #31455e; }

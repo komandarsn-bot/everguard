@@ -119,3 +119,5 @@ intervalControl.addEventListener('change', () => {
 });
 connect(connection);
 mountPush(connection);
+import { mountAccount } from './account.js';
+mountAccount(connection);
