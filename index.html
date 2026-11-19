@@ -7,7 +7,7 @@
   <title>EVERGUARD — показания станции</title>
   <link rel="stylesheet" href="./dashboard.css?v=account">
   <link rel="manifest" href="./manifest.webmanifest">
-  <script type="module" src="./dashboard.js?v=account"></script>
+  <script type="module" src="./dashboard.js?v=sync"></script>
 </head>
 <body>
   <div class="layout">
@@ -29,7 +29,7 @@
           <option value="30">Каждые 30 секунд</option>
           <option value="60">Каждую минуту</option>
         </select>
-        <small>Настройка сохраняется в этом браузере.</small>
+        <small id="refresh-settings-status" role="status">Настройка сохраняется в этом браузере.</small>
         <div id="push-controls" hidden>
           <button class="history-refresh" id="push-button" type="button">Включить уведомления</button>
           <button class="history-refresh" id="push-test" type="button" hidden>Отправить тест</button>

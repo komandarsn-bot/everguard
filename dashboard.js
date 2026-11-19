@@ -108,16 +108,82 @@ const connection = {
   key: 'sb_publishable_Ic_mUoZn5-WywZesME_j4w_8-8T46Tq',
 };
 updateHistory = mountHistory(connection);
-intervalControl.addEventListener('change', () => {
+const syncStatus = document.querySelector('#refresh-settings-status');
+const settingsUrl = new URL('/rest/v1/everguard_account_settings', connection.project);
+let accountSettings;
+let accountVersion = 0;
+
+function refreshNow() {
+  clearTimeout(timer);
+  refresh(connection, ++settingsVersion);
+}
+
+async function syncAccount(token) {
+  const version = ++accountVersion;
+  accountSettings = undefined;
+  intervalControl.disabled = Boolean(token);
+  try {
+    if (!token) {
+      intervalControl.value = '5';
+      const saved = localStorage.getItem(intervalKey);
+      if (intervals.includes(saved)) intervalControl.value = saved;
+      refreshNow();
+      return;
+    }
+    syncStatus.textContent = 'Загружаем настройку аккаунта…';
+    const headers = { apikey: connection.key, Authorization: 'Bearer ' + token };
+    const userResponse = await fetch(new URL('/auth/v1/user', connection.project), { headers, signal: AbortSignal.timeout(8000) });
+    if (!userResponse.ok) throw new Error('Account lookup failed');
+    const user = await userResponse.json();
+    const response = await fetch(settingsUrl, { headers, signal: AbortSignal.timeout(8000) });
+    if (!response.ok) throw new Error('Settings lookup failed');
+    const [saved] = await response.json();
+    if (version !== accountVersion) return;
+    accountSettings = { id: user.id, headers };
+    intervalControl.value = String(saved?.refresh_seconds ?? 5);
+    syncStatus.textContent = 'Настройка применяется на устройствах этого аккаунта при входе.';
+    refreshNow();
+  } catch {
+    if (version === accountVersion && token) syncStatus.textContent = 'Настройки аккаунта недоступны. Войдите снова, чтобы повторить.';
+  } finally {
+    if (version === accountVersion) {
+      intervalControl.disabled = false;
+      if (!token) syncStatus.textContent = 'Настройка сохраняется в этом браузере.';
+    }
+  }
+}
+
+intervalControl.addEventListener('change', async () => {
+  const account = accountSettings;
+  if (account) {
+    const version = accountVersion;
+    intervalControl.disabled = true;
+    syncStatus.textContent = 'Сохраняем настройку аккаунта…';
+    refreshNow();
+    try {
+      const response = await fetch(settingsUrl, {
+        method: 'POST',
+        headers: { ...account.headers, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' },
+        body: JSON.stringify({ user_id: account.id, refresh_seconds: Number(intervalControl.value) }),
+        signal: AbortSignal.timeout(8000),
+      });
+      if (!response.ok) throw new Error('Settings update failed');
+      if (version === accountVersion) syncStatus.textContent = 'Настройка сохранена в аккаунте.';
+    } catch {
+      if (version === accountVersion) syncStatus.textContent = 'Интервал применён здесь. Сохранить его в аккаунте не удалось.';
+    } finally {
+      if (version === accountVersion) intervalControl.disabled = false;
+    }
+    return;
+  }
   try {
     localStorage.setItem(intervalKey, intervalControl.value);
   } catch {
     // The interval still applies until the page is closed.
   }
-  clearTimeout(timer);
-  refresh(connection, ++settingsVersion);
+  refreshNow();
 });
 connect(connection);
 mountPush(connection);
-import { mountAccount } from './account.js';
-mountAccount(connection);
+import { mountAccount } from './account.js?v=sync';
+mountAccount(connection, syncAccount);

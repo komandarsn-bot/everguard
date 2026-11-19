@@ -1,4 +1,4 @@
-export function mountAccount(connection) {
+export function mountAccount(connection, onSessionChange) {
   const form = document.querySelector('#account-login');
   const logout = document.querySelector('#account-logout');
   const status = document.querySelector('#account-status');
@@ -11,6 +11,7 @@ export function mountAccount(connection) {
     clearTimeout(expiryTimer);
     form.hidden = Boolean(session);
     logout.hidden = !session;
+    onSessionChange(session?.access_token);
     if (session) {
       status.textContent = 'Вы вошли как ' + session.username;
       expiryTimer = setTimeout(() => {
