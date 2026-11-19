@@ -19,6 +19,7 @@ const readings = fields.map((field) => {
 let settingsVersion = 0;
 let updatedAt;
 let timer;
+let updateHistory;
 const intervalControl = document.querySelector('#refresh-interval');
 function showStatus(state, title, detail) {
   panel.dataset.state = state;
