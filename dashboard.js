@@ -1,4 +1,5 @@
-import { mountHistory } from './history.js?v=full-history';
+import { authorization, connection, readSession, returnToLogin, signOut, validateSession } from './account.js?v=signin';
+import { mountHistory } from './history.js?v=signin';
 import { mountPush } from './push.js?v=test';
 
 const status = document.querySelector('#status');
@@ -19,16 +20,6 @@ let settingsVersion = 0;
 let updatedAt;
 let timer;
 const intervalControl = document.querySelector('#refresh-interval');
-const intervalKey = 'everguard-refresh-interval';
-const intervals = ['5', '10', '30', '60'];
-try {
-  const saved = localStorage.getItem(intervalKey);
-  if (intervals.includes(saved)) intervalControl.value = saved;
-} catch {
-  // Keep the default when storage is unavailable.
-}
-let updateHistory;
-
 function showStatus(state, title, detail) {
   panel.dataset.state = state;
   label.textContent = title;
@@ -67,7 +58,7 @@ async function refresh(connection, version) {
       limit: '1',
     });
     const response = await fetch(endpoint, {
-      headers: { apikey: connection.key },
+      headers: connection.headers,
       cache: 'no-store',
       signal: AbortSignal.timeout(8000),
     });
@@ -103,87 +94,65 @@ function connect(connection) {
   refresh(connection, ++settingsVersion);
 }
 
-const connection = {
-  project: 'https://zddwdjlwqmlysegxrruz.supabase.co',
-  key: 'sb_publishable_Ic_mUoZn5-WywZesME_j4w_8-8T46Tq',
-};
-updateHistory = mountHistory(connection);
-const syncStatus = document.querySelector('#refresh-settings-status');
-const settingsUrl = new URL('/rest/v1/everguard_account_settings', connection.project);
-let accountSettings;
-let accountVersion = 0;
+async function startDashboard() {
+  const session = readSession();
+  const user = session && await validateSession(session).catch(() => undefined);
+  if (!user) {
+    returnToLogin();
+    return;
+  }
 
-function refreshNow() {
-  clearTimeout(timer);
-  refresh(connection, ++settingsVersion);
-}
+  const headers = authorization(session.access_token);
+  const dataConnection = { ...connection, headers };
+  const settingsUrl = new URL('/rest/v1/everguard_account_settings', connection.project);
+  const syncStatus = document.querySelector('#refresh-settings-status');
+  const logout = document.querySelector('#account-logout');
 
-async function syncAccount(token) {
-  const version = ++accountVersion;
-  accountSettings = undefined;
-  intervalControl.disabled = Boolean(token);
+  document.querySelector('#account-status').textContent = 'Вы вошли как ' + session.username;
+  logout.addEventListener('click', () => {
+    document.querySelector('.layout').hidden = true;
+    signOut(session);
+  });
+  setTimeout(returnToLogin, Math.max(0, session.expires_at * 1000 - Date.now()));
+  document.querySelector('.layout').hidden = false;
+
+  updateHistory = mountHistory(dataConnection);
+  connect(dataConnection);
+  mountPush(connection);
+  intervalControl.disabled = true;
+  syncStatus.textContent = 'Загружаем настройку аккаунта…';
   try {
-    if (!token) {
-      intervalControl.value = '5';
-      const saved = localStorage.getItem(intervalKey);
-      if (intervals.includes(saved)) intervalControl.value = saved;
-      refreshNow();
-      return;
-    }
-    syncStatus.textContent = 'Загружаем настройку аккаунта…';
-    const headers = { apikey: connection.key, Authorization: 'Bearer ' + token };
-    const userResponse = await fetch(new URL('/auth/v1/user', connection.project), { headers, signal: AbortSignal.timeout(8000) });
-    if (!userResponse.ok) throw new Error('Account lookup failed');
-    const user = await userResponse.json();
     const response = await fetch(settingsUrl, { headers, signal: AbortSignal.timeout(8000) });
     if (!response.ok) throw new Error('Settings lookup failed');
     const [saved] = await response.json();
-    if (version !== accountVersion) return;
-    accountSettings = { id: user.id, headers };
     intervalControl.value = String(saved?.refresh_seconds ?? 5);
-    syncStatus.textContent = 'Настройка применяется на устройствах этого аккаунта при входе.';
-    refreshNow();
+    syncStatus.textContent = 'Настройка сохраняется в аккаунте.';
   } catch {
-    if (version === accountVersion && token) syncStatus.textContent = 'Настройки аккаунта недоступны. Войдите снова, чтобы повторить.';
+    syncStatus.textContent = 'Не удалось загрузить настройку аккаунта.';
   } finally {
-    if (version === accountVersion) {
-      intervalControl.disabled = false;
-      if (!token) syncStatus.textContent = 'Настройка сохраняется в этом браузере.';
-    }
+    intervalControl.disabled = false;
   }
-}
 
-intervalControl.addEventListener('change', async () => {
-  const account = accountSettings;
-  if (account) {
-    const version = accountVersion;
+  intervalControl.addEventListener('change', async () => {
     intervalControl.disabled = true;
     syncStatus.textContent = 'Сохраняем настройку аккаунта…';
-    refreshNow();
+    clearTimeout(timer);
+    refresh(dataConnection, ++settingsVersion);
     try {
       const response = await fetch(settingsUrl, {
         method: 'POST',
-        headers: { ...account.headers, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' },
-        body: JSON.stringify({ user_id: account.id, refresh_seconds: Number(intervalControl.value) }),
+        headers: { ...headers, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' },
+        body: JSON.stringify({ user_id: user.id, refresh_seconds: Number(intervalControl.value) }),
         signal: AbortSignal.timeout(8000),
       });
       if (!response.ok) throw new Error('Settings update failed');
-      if (version === accountVersion) syncStatus.textContent = 'Настройка сохранена в аккаунте.';
+      syncStatus.textContent = 'Настройка сохранена в аккаунте.';
     } catch {
-      if (version === accountVersion) syncStatus.textContent = 'Интервал применён здесь. Сохранить его в аккаунте не удалось.';
+      syncStatus.textContent = 'Интервал применён здесь. Сохранить его в аккаунте не удалось.';
     } finally {
-      if (version === accountVersion) intervalControl.disabled = false;
+      intervalControl.disabled = false;
     }
-    return;
-  }
-  try {
-    localStorage.setItem(intervalKey, intervalControl.value);
-  } catch {
-    // The interval still applies until the page is closed.
-  }
-  refreshNow();
-});
-connect(connection);
-mountPush(connection);
-import { mountAccount } from './account.js?v=sync';
-mountAccount(connection, syncAccount);
+  });
+}
+
+startDashboard();

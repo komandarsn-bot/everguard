@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171f2b">
+  <title>Вход в EVERGUARD</title>
+  <link rel="stylesheet" href="./dashboard.css?v=signin">
+</head>
+<body class="sign-in-page">
+  <main class="sign-in">
+    <div class="identity"><span class="mark" aria-hidden="true"></span><p class="brand">EVERGUARD</p></div>
+    <h1>Вход в аккаунт</h1>
+    <form id="account-login" class="account-form">
+      <label for="account-username">Логин</label>
+      <input id="account-username" name="username" autocomplete="username" required>
+      <label for="account-password">Пароль</label>
+      <input id="account-password" name="password" type="password" autocomplete="current-password" required>
+      <button class="history-refresh" type="submit">Войти</button>
+      <p class="account-status" id="account-status" role="status"></p>
+    </form>
+  </main>
+  <script type="module">
+    import { mountLogin } from './account.js?v=signin';
+    mountLogin();
+  </script>
+</body>
+</html>

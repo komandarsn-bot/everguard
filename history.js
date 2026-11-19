@@ -188,7 +188,7 @@ export function mountHistory(connection) {
     endpoint.searchParams.append('recorded_at', 'lte.' + new Date(end).toISOString());
     async function getPage(url) {
       const response = await fetch(url, {
-        headers: { apikey: connection.key },
+        headers: connection.headers,
         signal: AbortSignal.any([active.signal, AbortSignal.timeout(10000)]),
         cache: 'no-store',
       });
