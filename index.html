@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#171f2b">
   <title>EVERGUARD — показания станции</title>
-  <link rel="stylesheet" href="./dashboard.css?v=station-panel">
+  <link rel="stylesheet" href="./dashboard.css?v=notifications">
   <link rel="manifest" href="./manifest.webmanifest">
-  <script type="module" src="./dashboard.js?v=station-interval"></script>
+  <script type="module" src="./dashboard.js?v=notifications"></script>
 </head>
 <body>
   <div class="layout" hidden>
@@ -32,6 +32,12 @@
         </select>
         <small>Оценка учитывает отправку станцией и проверку базы сайтом.</small>
         <small id="refresh-settings-status" role="status">Настройка сохраняется в этом браузере.</small>
+        <form id="notification-rules" class="notification-rules" hidden>
+          <h3>Пороги уведомлений</h3>
+          <div id="notification-rule-fields"></div>
+          <button class="history-refresh" type="submit">Сохранить пороги</button>
+          <p id="notification-rule-status" role="status"></p>
+        </form>
         <div id="push-controls" hidden>
           <h3>Уведомления</h3>
           <button class="history-refresh" id="push-button" type="button">Включить уведомления</button>
@@ -48,6 +54,11 @@
     <main class="workspace">
       <div class="content">
         <h1>Показания станции</h1>
+        <details class="group notification-inbox" id="notification-inbox" hidden>
+          <summary>История уведомлений</summary>
+          <p id="notification-history-status" role="status"></p>
+          <ol id="notification-history"></ol>
+        </details>
         <section class="group" aria-labelledby="climate">
           <div class="group-heading"><h2 id="climate">Микроклимат</h2><small>DHT22</small></div>
           <div class="metrics">

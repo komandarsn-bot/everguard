@@ -1,6 +1,7 @@
 import { authorization, connection, readSession, returnToLogin, signOut, validateSession } from './account.js?v=signin';
 import { mountHistory } from './history.js?v=station-interval';
 import { mountPush } from './push.js?v=test';
+import { mountNotifications } from './notifications.js';
 
 const status = document.querySelector('#status');
 const panel = document.querySelector('#status-panel');
@@ -120,6 +121,7 @@ async function startDashboard() {
   updateHistory = mountHistory(dataConnection);
   connect(dataConnection);
   mountPush(connection);
+  mountNotifications(dataConnection, user.id);
   intervalControl.disabled = true;
   syncStatus.textContent = 'Загружаем настройку аккаунта…';
   try {
