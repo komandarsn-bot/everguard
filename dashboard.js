@@ -1,5 +1,5 @@
 import { authorization, connection, readSession, returnToLogin, signOut, validateSession } from './account.js?v=signin';
-import { mountHistory } from './history.js?v=signin';
+import { mountHistory } from './history.js?v=station-interval';
 import { mountPush } from './push.js?v=test';
 
 const status = document.querySelector('#status');
@@ -73,7 +73,7 @@ async function refresh(connection, version) {
     if (!time) {
       showStatus('loading', 'Ожидание данных', 'В базе пока нет показаний.');
     } else {
-      const stale = Date.now() - time.getTime() > 90000;
+      const stale = Date.now() - time.getTime() > 390000;
       showStatus(stale ? 'stale' : 'live', stale ? 'Нет свежих данных' : 'Данные поступают',
         'Последняя запись · ' + time.toLocaleString('ru-KZ'));
     }

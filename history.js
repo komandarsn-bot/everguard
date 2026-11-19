@@ -1,7 +1,7 @@
 const units = { temperature: '°C', humidity: '%', mq2: 'АЦП', mq135: 'АЦП' };
 const number = new Intl.NumberFormat('ru-KZ', { maximumFractionDigits: 2 });
 const minute = 60000;
-const gapThreshold = 60000;
+const gapThreshold = 390000;
 const pointTime = new Intl.DateTimeFormat('ru-KZ', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
 function makeScale(min, max, integer) {
