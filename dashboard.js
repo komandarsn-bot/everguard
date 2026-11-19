@@ -18,6 +18,15 @@ const readings = fields.map((field) => {
 let settingsVersion = 0;
 let updatedAt;
 let timer;
+const intervalControl = document.querySelector('#refresh-interval');
+const intervalKey = 'everguard-refresh-interval';
+const intervals = ['5', '10', '30', '60'];
+try {
+  const saved = localStorage.getItem(intervalKey);
+  if (intervals.includes(saved)) intervalControl.value = saved;
+} catch {
+  // Keep the default when storage is unavailable.
+}
 let updateHistory;
 
 function showStatus(state, title, detail) {
@@ -82,7 +91,7 @@ async function refresh(connection, version) {
       ? 'Нет связи с базой · последняя запись ' + new Date(updatedAt).toLocaleString('ru-KZ')
       : 'Не удалось загрузить показания. Повторяем запрос…');
   } finally {
-    if (version === settingsVersion) timer = setTimeout(() => refresh(connection, version), 5000);
+    if (version === settingsVersion) timer = setTimeout(() => refresh(connection, version), Number(intervalControl.value) * 1000);
   }
 }
 
@@ -99,5 +108,14 @@ const connection = {
   key: 'sb_publishable_Ic_mUoZn5-WywZesME_j4w_8-8T46Tq',
 };
 updateHistory = mountHistory(connection);
+intervalControl.addEventListener('change', () => {
+  try {
+    localStorage.setItem(intervalKey, intervalControl.value);
+  } catch {
+    // The interval still applies until the page is closed.
+  }
+  clearTimeout(timer);
+  refresh(connection, ++settingsVersion);
+});
 connect(connection);
 mountPush(connection);

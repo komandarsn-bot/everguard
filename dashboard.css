@@ -24,6 +24,11 @@ body { margin: 0; }
 .brand { margin: 0; font-size: .98rem; letter-spacing: .14em; font-weight: 750; }
 .description { margin: 4px 0 0; color: #bdc9d7; font-size: .81rem; }
 .status-panel { margin-top: 24px; }
+.station-settings { margin-top: 20px; font-size: .86rem; }
+.station-settings summary { cursor: pointer; font-weight: 650; }
+.station-settings label { display: block; margin: 12px 0 6px; }
+.station-settings select { max-width: 100%; padding: 7px; color: #f3f6fa; background: #243347; border: 1px solid #51647d; border-radius: 6px; font: inherit; }
+.station-settings small { display: block; margin-top: 6px; color: #bdc9d7; }
 #push-controls { margin-top: 18px; }
 #push-button, #push-test { color: #f3f6fa; background: #243347; border-color: #51647d; }
 #push-button:hover, #push-test:hover { background: #31455e; }
