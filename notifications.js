@@ -27,7 +27,7 @@ export async function mountNotifications(connection, userId) {
       const field = document.createElement('fieldset');
       field.innerHTML = `<legend>${label}</legend>
         <label><input name="${metric}-enabled" type="checkbox"> Включить</label>
-        <label>Порог, ${unit}<input name="${metric}" type="number" min="${step}" max="${max}" step="${step}" required></label>`;
+        <label>Изменение, ${unit}<input name="${metric}" type="number" min="${step}" max="${max}" step="${step}" required></label>`;
       field.querySelector('[type=checkbox]').checked = current?.enabled ?? true;
       field.querySelector('[type=number]').value = current?.threshold ?? fallback;
       fields.append(field);
@@ -41,7 +41,7 @@ export async function mountNotifications(connection, userId) {
     event.preventDefault();
     const button = form.querySelector('button');
     button.disabled = true;
-    formStatus.textContent = 'Сохраняем пороги…';
+    formStatus.textContent = 'Сохраняем настройки…';
     const data = new FormData(form);
     try {
       const response = await fetch(rulesUrl, {
@@ -53,9 +53,9 @@ export async function mountNotifications(connection, userId) {
         }))),
       });
       if (!response.ok) throw new Error('Could not save rules');
-      formStatus.textContent = 'Пороги сохранены.';
+      formStatus.textContent = 'Настройки сохранены.';
     } catch {
-      formStatus.textContent = 'Не удалось сохранить пороги.';
+      formStatus.textContent = 'Не удалось сохранить настройки.';
     } finally {
       button.disabled = false;
     }

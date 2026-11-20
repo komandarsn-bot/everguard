@@ -7,7 +7,7 @@
   <title>EVERGUARD — показания станции</title>
   <link rel="stylesheet" href="./dashboard.css?v=compact-settings">
   <link rel="manifest" href="./manifest.webmanifest">
-  <script type="module" src="./dashboard.js?v=notifications"></script>
+  <script type="module" src="./dashboard.js?v=change-labels"></script>
 </head>
 <body>
   <div class="layout" hidden>
@@ -34,9 +34,9 @@
         <small id="refresh-settings-status" role="status">Настройка сохраняется в этом браузере.</small>
         <form id="notification-rules" class="notification-rules" hidden>
           <details class="threshold-settings">
-            <summary>Пороги уведомлений</summary>
+            <summary>Уведомления об изменениях</summary>
             <div id="notification-rule-fields"></div>
-            <button class="history-refresh" type="submit">Сохранить пороги</button>
+            <button class="history-refresh" type="submit">Сохранить настройки</button>
             <p id="notification-rule-status" role="status"></p>
           </details>
         </form>

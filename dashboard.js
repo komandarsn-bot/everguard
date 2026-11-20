@@ -1,7 +1,7 @@
 import { authorization, connection, readSession, returnToLogin, signOut, validateSession } from './account.js?v=signin';
 import { mountHistory } from './history.js?v=station-interval';
 import { mountPush } from './push.js?v=test';
-import { mountNotifications } from './notifications.js';
+import { mountNotifications } from './notifications.js?v=change-labels';
 
 const status = document.querySelector('#status');
 const panel = document.querySelector('#status-panel');
